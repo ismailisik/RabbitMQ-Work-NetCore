@@ -15,15 +15,24 @@ namespace Publisher.RabbitMQ
             {
                 using (var channel = connection.CreateModel())
                 {
-                    channel.QueueDeclare("Hello_RabbitMQ", false, false, false, null);
+                    //Not: durable: true yapar isem RabbitMQ'nun kurulu olduğu server yada instance reset yese dahi silinmez(Sağlama almış olurum) Buna ek olarak tabiki property de tanımlamak ve Persistance true ye çekmek gerekmektedir. 
+                    channel.QueueDeclare("test_queue", durable:true, false, false, null);
 
-                    var MyMessage ="Bu RabbitMQ Test Messajıdır.";
+                    // var MyMessage ="Bu RabbitMQ Test Messajıdır.";
 
-                    var bodyByte = Encoding.UTF8.GetBytes(MyMessage);
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var bodyByte = Encoding.UTF8.GetBytes($"Message--{i}");
 
-                    channel.BasicPublish("", "Hello_RabbitMQ",null,bodyByte);
+                        //Property tanımlama...
+                        var property = channel.CreateBasicProperties();
+                        property.Persistent = true;
 
-                    Console.WriteLine("Messajınız İletildi");
+                        channel.BasicPublish("", "test_queue", property, bodyByte);
+
+                        Console.WriteLine("Messajınız İletildi");
+                    }
+
                 }
 
                 Console.WriteLine("Çıkmak İçin Bir Tuşa Basınız...");
