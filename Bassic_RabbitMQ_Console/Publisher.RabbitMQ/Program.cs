@@ -1,6 +1,7 @@
 ﻿using RabbitMQ.Client;
 using System;
 using System.Text;
+using System.Threading;
 
 namespace Publisher.RabbitMQ
 {
@@ -16,7 +17,14 @@ namespace Publisher.RabbitMQ
                 using (var channel = connection.CreateModel())
                 {
                     //Not: durable: true yapar isem RabbitMQ'nun kurulu olduğu server yada instance reset yese dahi silinmez(Sağlama almış olurum) Buna ek olarak tabiki property de tanımlamak ve Persistance true ye çekmek gerekmektedir. 
-                    channel.QueueDeclare("test_queue", durable:true, false, false, null);
+
+                    //Burada bir queue declare ettik...
+                    //channel.QueueDeclare("test_queue", durable:true, false, false, null);
+
+                    //***RabbitMQ Exchange tipleri incelenecektir***//
+
+                    //Exchange Type Fanout: Messajı bu service subcribe olan tüm instance lara gönderir.
+                    channel.ExchangeDeclare("log",type:ExchangeType.Fanout,durable:true);
 
                     // var MyMessage ="Bu RabbitMQ Test Messajıdır.";
 
@@ -28,7 +36,11 @@ namespace Publisher.RabbitMQ
                         var property = channel.CreateBasicProperties();
                         property.Persistent = true;
 
-                        channel.BasicPublish("", "test_queue", property, bodyByte);
+                        //Exchange tanımladıysan ona göre burada onu vermen gerekmektedir.
+
+                        //Not:RouteKey vermedim çünkü benim exchange tipim fanout bu servisime subscribe olan tüm dinleyicilere gönderecek mesajı.
+                        Thread.Sleep(1000);
+                        channel.BasicPublish("log", routingKey:"", property, bodyByte);
 
                         Console.WriteLine("Messajınız İletildi");
                     }

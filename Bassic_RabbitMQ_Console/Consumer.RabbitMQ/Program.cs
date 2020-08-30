@@ -16,7 +16,14 @@ namespace Consumer.RabbitMQ
             {
                 using (var channel = connection.CreateModel())
                 {
-                    channel.QueueDeclare("test_queue", durable: true, false, false, null);
+                    //channel.QueueDeclare("test_queue", durable: true, false, false, null);
+
+                    //Exchange: fanout
+                    channel.ExchangeDeclare("log", type: ExchangeType.Fanout, durable: true);
+
+                    //Ben fanout olarak exchangemi belirledim ve bir publisher oluşturdum ancak o queue ye bir cunsumer bind etmem gerekli.
+                    var queueName = channel.QueueDeclare().QueueName; //Rondom bir queue name üretir.
+                    channel.QueueBind(queue: queueName, "log", routingKey: "");
 
                     //Benim Insance'ım tek seferde kaç tane mesaj alacağını aşağıdaki gibi ayarlayabiliri.
 
@@ -27,7 +34,10 @@ namespace Consumer.RabbitMQ
 
                     //Bir diğer önemi parametremiz autoAck (Otomatik bilgilendirme: yani ben bu mesajı işledim bilgisini otomatik olarak MQ ya bildiriyor. Ben bunu false yaparsam manuel olarak kontrol ettirmem gerekmektedir).
 
-                    channel.BasicConsume("test_queue",autoAck: false, consumer);
+                    //channel.BasicConsume("test_queue",autoAck: false, consumer);
+
+                    //Fanout Exchange
+                    channel.BasicConsume(queueName, false, consumer);
 
                     //Publisher tarafından gönderilemn messajları Recived event'ı ile dinlemeye başladık.
                     consumer.Received += (model, ea) =>
