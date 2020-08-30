@@ -16,14 +16,60 @@ namespace Consumer.RabbitMQ
             {
                 using (var channel = connection.CreateModel())
                 {
+
+                    #region Fanout Exchange Consumer
+                    ////channel.QueueDeclare("test_queue", durable: true, false, false, null);
+
+                    ////Exchange: fanout
+                    //channel.ExchangeDeclare("log", type: ExchangeType.Fanout, durable: true);
+
+                    ////Ben fanout olarak exchangemi belirledim ve bir publisher oluşturdum ancak o queue ye bir cunsumer bind etmem gerekli.
+                    //var queueName = channel.QueueDeclare().QueueName; //Rondom bir queue name üretir.
+                    //channel.QueueBind(queue: queueName, "log", routingKey: "");
+
+                    ////Benim Insance'ım tek seferde kaç tane mesaj alacağını aşağıdaki gibi ayarlayabiliri.
+
+                    //channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
+                    ////Yukarıdaki ifade şu demek: Ben her defasında 1 tane mesaj alırım onu işledikten sonra diğerini alırım. False koyduğumuz global parametreside şu demek: Benim tek instancem belirlediğim kadar mesaj alır. Global true yapsaydım varsayalım benim bu instancem'den 5 tane vardı ve ben 10 a çektim mesaj sayımı tüm instanceler totalda 1 defada 10 messaj alabilirdi.(Yani her instance 2 şer mesaj alırdı).
+
+                    //var consumer = new EventingBasicConsumer(channel);
+
+                    ////Bir diğer önemi parametremiz autoAck (Otomatik bilgilendirme: yani ben bu mesajı işledim bilgisini otomatik olarak MQ ya bildiriyor. Ben bunu false yaparsam manuel olarak kontrol ettirmem gerekmektedir).
+
+                    ////channel.BasicConsume("test_queue",autoAck: false, consumer);
+
+                    ////Fanout Exchange
+                    //channel.BasicConsume(queueName, false, consumer);
+
+                    ////Publisher tarafından gönderilemn messajları Recived event'ı ile dinlemeye başladık.
+                    //consumer.Received += (model, ea) =>
+                    //{
+                    //    var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    //    Console.WriteLine($"Mesajınız: {message}");
+
+                    //    //Alttaki ifade ben mesajı halletim bana yenisini gönderebilirsin mesajını MQ'ya iletir.
+                    //    channel.BasicAck(ea.DeliveryTag, multiple: false); //Bu mesajı MQ(brocker) alamazsa mesajı silmez. İşlenemedi demektir.
+                    //};
+
+                    //Console.WriteLine("Çıkmak İçin Bir Tuşa Basınız...");
+                    //Console.ReadLine();
+                    #endregion
+
+                    #region Direct Exchange Consumer
                     //channel.QueueDeclare("test_queue", durable: true, false, false, null);
 
-                    //Exchange: fanout
-                    channel.ExchangeDeclare("log", type: ExchangeType.Fanout, durable: true);
+                    //Exchange: Direct
+                    channel.ExchangeDeclare("direct-exchange", type: ExchangeType.Direct, durable: true);
 
-                    //Ben fanout olarak exchangemi belirledim ve bir publisher oluşturdum ancak o queue ye bir cunsumer bind etmem gerekli.
-                    var queueName = channel.QueueDeclare().QueueName; //Rondom bir queue name üretir.
-                    channel.QueueBind(queue: queueName, "log", routingKey: "");
+                    //Ben Direct olarak exchangemi belirledim ve bir publisher oluşturdum ancak bu publisheri spesifik routeKey ile queue ye bir consumer bind etmem gerekli.
+
+                     var queueName = channel.QueueDeclare().QueueName; //Rondom bir queue name üretir.
+
+                    foreach (var item in Enum.GetNames(typeof(LogNames)))
+                    {
+                       
+                        channel.QueueBind(queue: queueName, "direct-exchange", routingKey: item);
+                    }
 
                     //Benim Insance'ım tek seferde kaç tane mesaj alacağını aşağıdaki gibi ayarlayabiliri.
 
@@ -36,14 +82,16 @@ namespace Consumer.RabbitMQ
 
                     //channel.BasicConsume("test_queue",autoAck: false, consumer);
 
-                    //Fanout Exchange
+                    //Direct Exchange
                     channel.BasicConsume(queueName, false, consumer);
+
+                    Console.WriteLine("Critical ve Error logralrını bekliyorum...");
 
                     //Publisher tarafından gönderilemn messajları Recived event'ı ile dinlemeye başladık.
                     consumer.Received += (model, ea) =>
                     {
                         var message = Encoding.UTF8.GetString(ea.Body.ToArray());
-                        Console.WriteLine($"Mesajınız: {message}");
+                        Console.WriteLine($"LogMessage---{message}");
 
                         //Alttaki ifade ben mesajı halletim bana yenisini gönderebilirsin mesajını MQ'ya iletir.
                         channel.BasicAck(ea.DeliveryTag, multiple: false); //Bu mesajı MQ(brocker) alamazsa mesajı silmez. İşlenemedi demektir.
@@ -51,10 +99,17 @@ namespace Consumer.RabbitMQ
 
                     Console.WriteLine("Çıkmak İçin Bir Tuşa Basınız...");
                     Console.ReadLine();
+                    #endregion
 
                 }
 
             }
         }
+    }
+
+    public enum LogNames
+    {
+        Critical,
+        Error
     }
 }
