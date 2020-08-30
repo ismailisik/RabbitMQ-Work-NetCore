@@ -22,6 +22,7 @@ namespace Publisher.RabbitMQ
                     //channel.QueueDeclare("test_queue", durable:true, false, false, null);
 
                     //***RabbitMQ Exchange tipleri incelenecektir***//
+
                     #region Fanout Exchange
                     ////Exchange Type Fanout: Publisher tarafından oluşturulan mesajları kendisini dinleyen tüm consumer lara gönderir.
                     //channel.ExchangeDeclare("log", type: ExchangeType.Fanout, durable: true);
@@ -48,17 +49,48 @@ namespace Publisher.RabbitMQ
                     #endregion
 
                     #region Direct Exchange
-                    //Exchange Type Direct: Publisher tarafından oluşturulan mesaj kendini dinleyen ve routingKey'leri eşleşen consumerlara gönderir.
-                    channel.ExchangeDeclare("direct-exchange", type: ExchangeType.Direct, durable: true);
+                    ////Exchange Type Direct: Publisher tarafından oluşturulan mesaj kendini dinleyen ve routingKey'leri eşleşen consumerlara gönderir.
+                    //channel.ExchangeDeclare("direct-exchange", type: ExchangeType.Direct, durable: true);
+
+                    //var logNames = Enum.GetValues(typeof(LogNames));
+
+                    //for (int i = 0; i < 10; i++)
+                    //{
+                    //    Random rnd = new Random();
+                    //    LogNames name =(LogNames)logNames.GetValue(rnd.Next(logNames.Length));
+                    //    var bodyByte = Encoding.UTF8.GetBytes($"LOG--{name.ToString()}");
+
+                    //    //Property tanımlama...
+                    //    var property = channel.CreateBasicProperties();
+                    //    property.Persistent = true;
+
+                    //    //Exchange tanımladıysan ona göre burada onu vermen gerekmektedir.
+
+                    //    //Not:RouteKey direct exchange de önemi belirli routeKey lere sahip consumerlara mesajı ileticek.
+                    //    Thread.Sleep(1000);
+                    //    channel.BasicPublish("direct-exchange", routingKey: name.ToString(), property, bodyByte);
+
+                    //    Console.WriteLine($"Messajınız İletildi Log:--{name.ToString()}");
+                    //}
+                    #endregion
+
+                    #region Topic Exchange
+                    //Exchange Type Topic: Publisher tarafından oluşturulan routingKey complex yapıda olabilir(Warning.Critical.Error v.b). Ben eğer belirli bir konuda(ör/: Warning) mesaj yollayan tüm publisher ları dinlemek istiyorsam routeKey'inde benim ilgilendiğim konu  var mı bakmalıyım... Bu tarz case'lerde Topic Exchange kullanılır.  
+                    channel.ExchangeDeclare("topic-exchange", type: ExchangeType.Topic, durable: true);
 
                     var logNames = Enum.GetValues(typeof(LogNames));
 
                     for (int i = 0; i < 10; i++)
                     {
                         Random rnd = new Random();
-                        LogNames name =(LogNames)logNames.GetValue(rnd.Next(logNames.Length));
-                        var bodyByte = Encoding.UTF8.GetBytes($"LOG--{name.ToString()}");
-                 
+                        LogNames name_1 = (LogNames)logNames.GetValue(rnd.Next(logNames.Length));
+                        LogNames name_2 = (LogNames)logNames.GetValue(rnd.Next(logNames.Length));
+                        LogNames name_3 = (LogNames)logNames.GetValue(rnd.Next(logNames.Length));
+
+                        var routeKey = $"{name_1.ToString()}.{name_2.ToString()}.{name_3.ToString()}";
+
+                        var bodyByte = Encoding.UTF8.GetBytes($"LOG--{name_1.ToString()}--{name_2.ToString()}--{name_3.ToString()}");
+
                         //Property tanımlama...
                         var property = channel.CreateBasicProperties();
                         property.Persistent = true;
@@ -67,9 +99,9 @@ namespace Publisher.RabbitMQ
 
                         //Not:RouteKey direct exchange de önemi belirli routeKey lere sahip consumerlara mesajı ileticek.
                         Thread.Sleep(1000);
-                        channel.BasicPublish("direct-exchange", routingKey: name.ToString(), property, bodyByte);
+                        channel.BasicPublish("topic-exchange", routingKey: routeKey, property, bodyByte);
 
-                        Console.WriteLine($"Messajınız İletildi Log:--{name.ToString()}");
+                        Console.WriteLine($"Messajınız İletildi Log:--{routeKey}");
                     }
                     #endregion
 
