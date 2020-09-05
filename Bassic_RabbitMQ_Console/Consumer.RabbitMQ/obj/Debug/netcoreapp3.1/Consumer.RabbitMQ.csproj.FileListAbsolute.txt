@@ -39,10 +39,10 @@ E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consu
 E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consumer.RabbitMQ\bin\Debug\netcoreapp3.1\RabbitMQ.Client.dll
 E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consumer.RabbitMQ\bin\Debug\netcoreapp3.1\System.Threading.Channels.dll
 E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consumer.RabbitMQ\obj\Debug\netcoreapp3.1\Consumer.RabbitMQ.csprojAssemblyReference.cache
-E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consumer.RabbitMQ\obj\Debug\netcoreapp3.1\Consumer.RabbitMQ.csproj.CoreCompileInputs.cache
 E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consumer.RabbitMQ\obj\Debug\netcoreapp3.1\Consumer.RabbitMQ.AssemblyInfoInputs.cache
 E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consumer.RabbitMQ\obj\Debug\netcoreapp3.1\Consumer.RabbitMQ.AssemblyInfo.cs
 E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consumer.RabbitMQ\obj\Debug\netcoreapp3.1\Consumer.RabbitMQ.csproj.CopyComplete
 E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consumer.RabbitMQ\obj\Debug\netcoreapp3.1\Consumer.RabbitMQ.dll
 E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consumer.RabbitMQ\obj\Debug\netcoreapp3.1\Consumer.RabbitMQ.pdb
 E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consumer.RabbitMQ\obj\Debug\netcoreapp3.1\Consumer.RabbitMQ.genruntimeconfig.cache
+E:\ProjectandWork\GithubWork\RabbitMQ-Work-NetCore\Bassic_RabbitMQ_Console\Consumer.RabbitMQ\obj\Debug\netcoreapp3.1\Consumer.RabbitMQ.csproj.CoreCompileInputs.cache

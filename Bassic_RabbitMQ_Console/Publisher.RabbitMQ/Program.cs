@@ -1,6 +1,10 @@
-﻿using RabbitMQ.Client;
+﻿using Publisher.RabbitMQ.Entity;
+using RabbitMQ.Client;
 using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 
 namespace Publisher.RabbitMQ
@@ -75,40 +79,73 @@ namespace Publisher.RabbitMQ
                     #endregion
 
                     #region Topic Exchange
-                    //Exchange Type Topic: Publisher tarafından oluşturulan routingKey complex yapıda olabilir(Warning.Critical.Error v.b). Ben eğer belirli bir konuda(ör/: Warning) mesaj yollayan tüm publisher ları dinlemek istiyorsam routeKey'inde benim ilgilendiğim konu  var mı bakmalıyım... Bu tarz case'lerde Topic Exchange kullanılır.  
-                    channel.ExchangeDeclare("topic-exchange", type: ExchangeType.Topic, durable: true);
+                    ////Exchange Type Topic: Publisher tarafından oluşturulan routingKey complex yapıda olabilir(Warning.Critical.Error v.b). Ben eğer belirli bir konuda(ör/: Warning) mesaj yollayan tüm publisher ları dinlemek istiyorsam routeKey'inde benim ilgilendiğim konu  var mı bakmalıyım... Bu tarz case'lerde Topic Exchange kullanılır.  
+                    //channel.ExchangeDeclare("topic-exchange", type: ExchangeType.Topic, durable: true);
 
-                    var logNames = Enum.GetValues(typeof(LogNames));
+                    //var logNames = Enum.GetValues(typeof(LogNames));
 
-                    for (int i = 0; i < 10; i++)
-                    {
-                        Random rnd = new Random();
-                        LogNames name_1 = (LogNames)logNames.GetValue(rnd.Next(logNames.Length));
-                        LogNames name_2 = (LogNames)logNames.GetValue(rnd.Next(logNames.Length));
-                        LogNames name_3 = (LogNames)logNames.GetValue(rnd.Next(logNames.Length));
+                    //for (int i = 0; i < 10; i++)
+                    //{
+                    //    Random rnd = new Random();
+                    //    LogNames name_1 = (LogNames)logNames.GetValue(rnd.Next(logNames.Length));
+                    //    LogNames name_2 = (LogNames)logNames.GetValue(rnd.Next(logNames.Length));
+                    //    LogNames name_3 = (LogNames)logNames.GetValue(rnd.Next(logNames.Length));
 
-                        var routeKey = $"{name_1.ToString()}.{name_2.ToString()}.{name_3.ToString()}";
+                    //    var routeKey = $"{name_1.ToString()}.{name_2.ToString()}.{name_3.ToString()}";
 
-                        var bodyByte = Encoding.UTF8.GetBytes($"LOG--{name_1.ToString()}--{name_2.ToString()}--{name_3.ToString()}");
+                    //    var bodyByte = Encoding.UTF8.GetBytes($"LOG--{name_1.ToString()}--{name_2.ToString()}--{name_3.ToString()}");
 
-                        //Property tanımlama...
-                        var property = channel.CreateBasicProperties();
-                        property.Persistent = true;
+                    //    //Property tanımlama...
+                    //    var property = channel.CreateBasicProperties();
+                    //    property.Persistent = true;
 
-                        //Exchange tanımladıysan ona göre burada onu vermen gerekmektedir.
+                    //    //Exchange tanımladıysan ona göre burada onu vermen gerekmektedir.
 
-                        //Not:RouteKey direct exchange de önemi belirli routeKey lere sahip consumerlara mesajı ileticek.
-                        Thread.Sleep(1000);
-                        channel.BasicPublish("topic-exchange", routingKey: routeKey, property, bodyByte);
+                    //    //Not:RouteKey direct exchange de önemi belirli routeKey lere sahip consumerlara mesajı ileticek.
+                    //    Thread.Sleep(1000);
+                    //    channel.BasicPublish("topic-exchange", routingKey: routeKey, property, bodyByte);
 
-                        Console.WriteLine($"Messajınız İletildi Log:--{routeKey}");
-                    }
+                    //    Console.WriteLine($"Messajınız İletildi Log:--{routeKey}");
+                    //}
+                    #endregion
+
+                    #region Header Exchange
+                    ////Exchange Type Header: Publisher tarafından header oluşturulur. Bu header key value şeklinde belirlenir(key:"Value").Önceki exchange type lardan farkı routingKey üzerinden değil header üzerinden kendisini dinlemek isteyenler dinleyebilir. Topic exchange ye göre daha esneklik sağlar.
+                    //channel.ExchangeDeclare("header-exchange", type: ExchangeType.Headers,true);
+
+                    ////Header oluşturalım..
+                    //var properties = channel.CreateBasicProperties();
+                    //Dictionary<string, object> headers = new Dictionary<string, object>();
+                    //headers.Add("status", false);
+                    //headers.Add("format", "Image");
+
+                    //properties.Headers = headers;
+
+                    ////Header oluşturdum Channel'i publish etmem lazım
+                    //channel.BasicPublish("header-exchange", String.Empty, properties, Encoding.UTF8.GetBytes("Bu Header Exchange Mesajıdır.."));
+
                     #endregion
 
 
-                }
+                    //***RabbitMQ CompexType ile çalışma***//
 
-                Console.WriteLine("Çıkmak İçin Bir Tuşa Basınız...");
+                    channel.QueueDeclare("Compex_Type", true,false,false,null);
+
+
+                    var TestList = new List<Test>() 
+                    {
+                        new Test{Id=1,Name="İsmail",LastName="IŞIK",Address="Bayrampaşa/İstanbul"},
+                        new Test{Id=2,Name="Harun",LastName="Güzel",Address="Bayrampaşa/İstanbul"},
+                        new Test{Id=3,Name="Jordan",LastName="IŞIK",Address="Bayrampaşa/İstanbul"}
+                    };
+
+                    var JsonTestList = JsonSerializer.Serialize(TestList);
+                    var base64TestList = Encoding.UTF8.GetBytes(JsonTestList);
+                  
+                    channel.BasicPublish("",routingKey: "Compex_Type", null, base64TestList);
+
+                }
+                
                 Console.ReadLine();
             }
         }
